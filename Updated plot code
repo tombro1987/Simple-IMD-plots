@@ -1,0 +1,117 @@
+### reading in ward level data ====
+
+ward <- read.csv(file.choose())
+View(ward)
+keep <- ward[, 3:4]
+#View(keep)
+ward <- data.frame(keep)
+View(ward)
+rm(keep)
+keep <- ward[1022:1049,]
+#View(keep)
+col.names <- c("Ward", "IMD")
+names(ward) <- col.names
+View(ward)
+ward <- data.frame(keep)
+names(ward) <- col.names
+View(ward)
+rm(keep, col.names)
+
+## reading in caries data ====
+
+caries <- read.csv(file.choose())
+View(caries)
+keep <- caries[ ,5:9]
+View(keep)
+keep$ward.code <- NULL
+keep$sound <- NULL
+keep$dmft <- NULL
+View(keep)
+caries <- data.frame(keep)
+rm(keep)
+View(caries)
+caries <- na.omit(caries)
+View(caries)
+col.names <- c("Ward", "meandmft")
+names(caries) <- col.names
+View(caries)
+rm(col.names)
+
+### Merging the two datasets ====
+
+data <- merge(caries, ward, by = "Ward")
+View(data)
+
+### attempting to plot the data ====
+
+#ggplot(adhs, aes(variable1, variable2)) + geom_point() + geom_smooth(method = lm) ## code from Phil
+
+class(data)
+class(data$meandmft)
+class(data$IMD)
+# the IMD data is a 'factor' (a categorical variable) - need to change it to a continuous value
+
+data$IMD <- as.numeric(as.character(data$IMD))
+
+ggplot(data, aes(data$IMD, data$meandmft)) + geom_point() + geom_smooth(method = lm) + xlab("IMD score per ward (2010)") + ylab("Mean dmft per ward (2011/12)")
+
+ggplot(data, aes(data$IMD, data$meandmft, colour = data$meandmft)) + geom_point() + geom_smooth(method = lm) + xlab("IMD score per ward (2010)") + ylab("Mean dmft per ward (2011/12)") + opts(title = "Mean dmft in the wards of Sheffield") + labs(colour = "Mean dmft\nper ward")   
+### Finding the R2 value ====
+
+m1 <- lm(data$meandmft ~ data$IMD)
+summary(m1)
+
+### Trying to do the same with the data at LSOA level ====
+
+LSOA <-  read.csv(file.choose())
+View(LSOA)
+
+# IMD score
+
+keep1 <- LSOA[,1:3]
+keep1[,2] <- NULL # getting rid of second column
+keep1 <- unique(keep1) # keeps only the unique values, no repetition from other rows
+keep1 <- na.omit(keep1)
+col.names <- c("lsoacode", "IMD")
+names(keep1) <- col.names
+View(keep1)
+
+table(duplicated(keep1$lsoacode)) # there are duplicates in this column, they need removing
+keep1 <- keep1[-7, ] # make sure you do these one at a time, the '-8' in the next row takes into account the previous row having been deleted
+keep1 <- keep1[-8, ]
+keep1 <- keep1[-159, ]
+keep1 <- keep1[-185, ]
+View(keep1)
+
+# lsoa level dmft data - only 338 lsoa's, as data missing for one centrally located lsoa
+
+keep2 <- LSOA[, 1:9]
+keep2[, 2]  <- NULL
+keep2[, 3]  <- NULL
+keep2[, 4]  <- NULL
+keep2[, 5]  <- NULL
+keep2[, 2]  <- NULL # it goes back to '2' here as the number of columns have decreased, so column 6 wouldn't exist
+keep2[, 2]  <- NULL
+keep2[, 2]  <- NULL
+keep2 <- na.omit(keep2) # getting rid of NA's from meandmft column before joining
+col.names <- c("lsoacode", "meandmft")
+names(keep2) <- col.names
+View(keep2)
+rm(col.names, LSOA)
+
+### merging the data
+
+lsoadata <- merge(keep1, keep2, by = "lsoacode")
+View(lsoadata)
+rm(keep1, keep2)
+
+class(lsoadata$IMD)
+class(lsoadata$meandmft)
+
+### ploting the data and obtaining the R2
+
+ggplot(lsoadata, aes(lsoadata$IMD, lsoadata$meandmft, colour = lsoadata$meandmft)) + geom_point() + geom_smooth(method = lm) + xlab("IMD score per LSOA (2010)") + ylab("Mean dmft per LSOA (2011/12)")+ opts(title = "Mean dmft per LSOA (Sheffield)") + labs(colour = "Mean dmft\nper LSOA")   
+
+m2 <- lm(lsoadata$meandmft ~ lsoadata$IMD)
+summary(m2) 
+
