@@ -55,7 +55,7 @@ data$IMD <- as.numeric(as.character(data$IMD))
 
 ggplot(data, aes(data$IMD, data$meandmft)) + geom_point() + geom_smooth(method = lm) + xlab("IMD score per ward (2010)") + ylab("Mean dmft per ward (2011/12)")
 
-ggplot(data, aes(data$IMD, data$meandmft, colour = data$meandmft)) + geom_point() + geom_smooth(method = lm) + xlab("IMD score per ward (2010)") + ylab("Mean dmft per ward (2011/12)") + ggtitle("Mean dmft in the ward of Sheffield - 5 year olds")  + labs(colour = "Mean dmft\nper ward")
+ggplot(data, aes(data$IMD, data$meandmft, colour = data$meandmft)) + geom_point() + geom_smooth(method = lm) + xlab("IMD score per ward (2010)") + ylab("Mean dmft per ward (2011/12)") + ggtitle("Mean dmft scores in Sheffield - 5 year olds")  + labs(colour = "Mean dmft\nper ward")  
 
 ### Finding the R2 value ====
 
