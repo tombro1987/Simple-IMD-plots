@@ -12,7 +12,7 @@ keep <- ward[1022:1049,]
 col.names <- c("Ward", "IMD")
 names(ward) <- col.names
 View(ward)
-ward <- data.frame(keep)
+ward <- data.frame(ward)
 names(ward) <- col.names
 View(ward)
 rm(keep, col.names)
